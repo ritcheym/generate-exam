@@ -1,0 +1,162 @@
+---
+title: "Exam Title"
+author: "Professor Fantastic"
+date: "February 23, 2017"
+output:
+  html_document:
+    keep_md: yes
+    theme: spacelab
+  html_notebook: default
+  word_document: default
+---
+
+```{r init, message=FALSE, warning=FALSE, include=FALSE}
+library('dplyr')
+```
+
+```{r loadQuestions, message=FALSE, warning=FALSE, include=FALSE}
+# Load questions
+# The csv file should have the following fields: Question, Type, Points, CorrectAnswer
+# For multiple-choice questions, additionally include: Lure1, Lure2, Lure3
+# For questions with an associated image, additionally include: Image
+# Also include any variables that you want to use to define the question order (e.g., Week)
+questionsFile <- 'examquestions'
+questions <- read.csv(paste0(questionsFile,'.csv'),stringsAsFactors=FALSE)
+
+# Define a unique number for each separate version; this will set the randomization
+seedNum <- 123  
+set.seed(seedNum)
+
+# Organize questions by week
+# Could alternatively use this section to select out questions from a bigger pool using filter
+questions$randomizer <- sample(nrow(questions))
+questions %>%
+  arrange(Week,randomizer) -> questions
+
+# Summary info
+numQs <- nrow(questions)
+totalPoints <- sum(questions$Points)
+
+```
+
+
+**ID:** ___________________________    **Date:** ____________________  *v`r seedNum`*
+
+This exam has `r numQs` questions. Make sure you complete every question. For multiple-choice questions, select the best answer. More than one may be somewhat correct, but one answer will be the “best” or most precise response to the question. For other questions, make sure to read the question closely. Some may ask for multiple pieces of information. Make sure to respond completely! Multiple-choice questions are worth two (2) points each, and true-false questions are worth one (1) point each. Other questions are graded as marked for a total of `r totalPoints` possible points.
+
+---
+
+```{r defineFormats, message=FALSE, warning=FALSE, include=FALSE}
+# Define functions for formatting
+
+# Multiple-choice with 4 randomized response options
+formatMC <- function(q,qnum) {
+  cat(qnum,'. ',q$Question,sep='')
+  cat(' \n')
+  cat(' \n')
+  
+  options <- c(q$CorrectAnswer,q$Lure1,q$Lure2,q$Lure3)
+  randorder <- sample(4)
+  cat('  \tA.',options[randorder[1]])
+  cat('  \n')
+  cat('  \tB.',options[randorder[2]])
+  cat('  \n')
+  cat('  \tC.',options[randorder[3]])
+  cat('  \n')
+  cat('  \tD.',options[randorder[4]])
+  cat('  \n')
+
+  optionLetters <- c('A','B','C','D')
+  correct <- optionLetters[which(randorder==1)]
+  
+  return(correct)
+}
+
+# True/ false
+formatTF <- function(q,qnum) {
+  cat(qnum,'. *True or False:* ',q$Question,sep='')
+  cat('  \t')
+  cat(' Circle one: True / False')
+  cat('  \n')
+
+  correct <- q$CorrectAnswer
+  
+  return(correct)
+}
+
+# Short-answer
+formatSA <- function(q,qnum) {
+  cat(qnum,'. ',q$Question,' *(',q$Points,' points)*',sep='')
+  cat('  \n')
+  
+  correct <- q$CorrectAnswer
+  
+  return(correct)
+}
+
+# Long-answer (same as short-answer but more space to write)
+formatLA <- function(q,qnum) {
+  cat(qnum,'. ',q$Question,' *(',q$Points,' points)*',sep='')
+  cat('  \n')
+  
+  correct <- q$CorrectAnswer
+  
+  return(correct)
+}
+
+# Image-labels (for inserting image below question)
+formatIL <- function(q,qnum) {
+  cat(qnum,'. ',q$Question,' *(',q$Points,' points)*',sep='')
+  cat('  \n')
+  cat('![](',q$Image,')',sep='')
+  cat('  \n')
+
+  correct <- q$CorrectAnswer
+  
+  return(correct)
+}
+
+```
+
+```{r presentQuestions, echo=FALSE, results="asis"}
+
+# Loop through questions
+# presenting them in the appropriate format and storing the correct answers
+correct.all <- character(length=numQs)
+order.all <- integer(length=numQs)
+for (n in c(1:numQs)) {
+  cat('  \n')
+  q <- questions[n,]
+  if (q$Type=="multiple-choice") {
+    correct <- formatMC(q,n)
+  } else if (q$Type=="short-answer") {
+    correct <- formatSA(q,n)
+  } else if (q$Type=="long-answer") {
+    correct <- formatLA(q,n)
+  } else if (q$Type=="T/F") {
+    correct <- formatTF(q,n)
+  } else if (q$Type=="image-labels") {
+    correct <- formatIL(q,n)
+  }
+  correct.all[n] <- correct
+  order.all[n] <- n
+}
+
+# End of exam
+cat(' \n END OF EXAM')
+```
+
+```{r finishUp, echo=FALSE}
+
+questions$Key <- correct.all
+questions$Order <- order.all
+
+# Simplify the question key
+questions %>%
+  select(Order,Points,Question,CorrectAnswer,Key) -> questions.key
+
+# Write out questions file with key included
+write.csv(questions.key,file=paste0(questionsFile,"_withkey_v",seedNum,".csv"))
+
+```
+
