@@ -1,7 +1,7 @@
 # generate-exam
 R markdown for generating a formatted exam from a csv of questions
 
-This repository shows an example of an R markdown script (**exam.Rmd**) that reads in a csv file of exam questions and turns it into a formatted exam. By using the `knitr` functions implemented in RStudio, you can easily knit the Rmd file into html, markdown, or Word documents. 
+This repository shows an example of an R markdown script (**exam.Rmd**) that reads in a csv file of exam questions and turns it into a formatted exam. By using the `knitr` functions implemented in RStudio, you can easily knit the Rmd file into html, markdown, or Word documents. The script includes functions for randomizing question order and multiple choice options, making it easy to create different exam versions.
 
 # How to use
 1. Download **exam.Rmd**. 
