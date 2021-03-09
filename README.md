@@ -24,6 +24,10 @@ After knitting, you will have an **exam.doc** or **exam.html** file. See **exam_
 
 The script also generates a csv file that contains your exam key. See **examquestions_withkey_v123.csv** for an example key. The key will be labeled with your seed version number.
 
+# COVID update
+
+Imagine that, due to a global pandemic, all of your exams now take place online through Canvas, and you can no longer use this neat script to create nicely formatted exams. Then imagine that, much to your horror, it appears that you have to manually copy and paste your questions into the Canvas quiz bank. Fret not - there is a solution. You can convert a lightly-modified version of your csv file into a QTI file that can be imported directly into Canvas. See instructions [here](https://canvas.k-state.edu/info/tools/scantron/faq/build-a-scantron-quiz.html). Phew!
+
 Happy teaching!
 
-Author: Maureen Ritchey, February 2017
+Author: Maureen Ritchey, 2017-2021
